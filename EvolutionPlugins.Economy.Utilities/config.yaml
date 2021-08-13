@@ -1,0 +1,53 @@
+pay:
+  player:
+    head: 10
+    torso: 5
+    arm: 2.5
+    leg: 2.5
+  zombie:
+    head: 5
+    torso: 2.5
+    arm: 1.25
+    leg: 1.25
+  zombieMega:
+    head: 8
+    torso: 4.5
+    arm: 2.25
+    leg: 2.25
+  timed:
+    time: 900
+
+lose:
+  death:
+    causes:
+      default: &d 2 # YAML Anchor https://docs.ansible.com/ansible/latest/user_guide/playbooks_advanced_syntax.html#yaml-anchors-and-aliases-sharing-variable-values
+      bleeding: *d
+      bones: *d
+      freezing: *d
+      burning: *d
+      food: *d
+      water: *d
+      gun: *d
+      melee: *d
+      zombie: *d
+      animal: *d
+      suicide: *d
+      kill: *d
+      infection: *d
+      punch: *d
+      breath: *d
+      roadkill: *d
+      vehicle: *d
+      grenade: *d
+      shred: *d
+      landmine: *d
+      arena: *d
+      missile: *d
+      charge: *d
+      splash: *d
+      sentry: *d
+      acid: *d
+      boulder: *d
+      burner: *d
+      spit: *d
+      spark: *d

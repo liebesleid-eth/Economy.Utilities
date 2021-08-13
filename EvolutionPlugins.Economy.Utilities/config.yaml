@@ -14,8 +14,11 @@ pay:
     torso: 4.5
     arm: 2.25
     leg: 2.25
-  timed:
-    time: 900
+  animal:
+    head: 8
+    torso: 4.5
+    arm: 2.25
+    leg: 2.25
 
 lose:
   death:

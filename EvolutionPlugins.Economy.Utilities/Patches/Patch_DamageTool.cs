@@ -8,7 +8,6 @@ namespace EvolutionPlugins.Economy.Utilities.Patches
     {
         internal static DamageZombieParameters s_CurrentDamageZombieParameters;
         internal static DamageAnimalParameters s_CurrentDamageAnimalParameters;
-        internal static DamagePlayerParameters s_CurrentDamagePlayerParameters;
 
         [HarmonyPatch(typeof(DamageTool), nameof(DamageTool.damageZombie))]
         [HarmonyPrefix]
@@ -36,20 +35,6 @@ namespace EvolutionPlugins.Economy.Utilities.Patches
         private static void PostDamageAnimal()
         {
             s_CurrentDamageAnimalParameters = default;
-        }
-
-        [HarmonyPatch(typeof(DamageTool), nameof(DamageTool.damagePlayer))]
-        [HarmonyPrefix]
-        private static void PreDamagePlayer(DamagePlayerParameters parameters)
-        {
-            s_CurrentDamagePlayerParameters = parameters;
-        }
-
-        [HarmonyPatch(typeof(DamageTool), nameof(DamageTool.damagePlayer))]
-        [HarmonyPostfix]
-        private static void PostDamagePlayer()
-        {
-            s_CurrentDamagePlayerParameters = default;
         }
     }
 }

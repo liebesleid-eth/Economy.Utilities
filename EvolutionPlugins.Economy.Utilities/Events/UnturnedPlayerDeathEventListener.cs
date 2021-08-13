@@ -69,14 +69,7 @@ namespace EvolutionPlugins.Economy.Utilities.Events
                     return;
                 }
 
-                var parsedLimb = @event.Limb switch
-                {
-                    ELimb.LEFT_FOOT or ELimb.LEFT_LEG or ELimb.RIGHT_FOOT or ELimb.RIGHT_LEG => "leg",
-                    ELimb.LEFT_HAND or ELimb.LEFT_ARM or ELimb.RIGHT_HAND or ELimb.RIGHT_ARM => "arm",
-                    ELimb.LEFT_BACK or ELimb.RIGHT_BACK or ELimb.LEFT_FRONT or ELimb.RIGHT_FRONT or ELimb.SPINE => "torso",
-                    ELimb.SKULL => "head",
-                    _ => throw new ArgumentOutOfRangeException(nameof(@event.Limb), "Limb is out of range")
-                };
+                var parsedLimb = @event.Limb.Parse();
 
                 var payMoney = m_Configuration.GetValue<decimal>($"pay:player:{parsedLimb}", 0);
                 if (!payMoney.IsNearlyZero())

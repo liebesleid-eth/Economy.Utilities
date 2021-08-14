@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using EvolutionPlugins.Economy.Utilities.Helpers;
 using Microsoft.Extensions.Configuration;
@@ -33,7 +32,7 @@ namespace EvolutionPlugins.Economy.Utilities.Events
             {
                 if (@event.Player != null)
                 {
-                    var loseMoney = m_Configuration.GetValue<decimal>($"lose:death:cause:{@event.DeathCause.ToString().ToLower()}", 0);
+                    var loseMoney = m_Configuration.GetValue<decimal>($"lose:death:causes:{@event.DeathCause.ToString().ToLower()}", 0);
                     if (!loseMoney.IsNearlyZero())
                     {
                         loseMoney *= -1.0m;
@@ -64,7 +63,7 @@ namespace EvolutionPlugins.Economy.Utilities.Events
                 {
                     return;
                 }
-                if (user is not OfflineUser && user is IPlayerUser playerUser && playerUser.Player.Equals(@event.Player))
+                if (user is IPlayerUser playerUser && playerUser.Player.Equals(@event.Player))
                 {
                     return;
                 }

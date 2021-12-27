@@ -2,6 +2,7 @@
 using Cysharp.Threading.Tasks;
 using EvolutionPlugins.Economy.Utilities.Helpers;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Localization;
 using OpenMod.API.Eventing;
 using OpenMod.API.Users;
 using OpenMod.Core.Users;
@@ -18,12 +19,15 @@ namespace EvolutionPlugins.Economy.Utilities.Events
         private readonly IEconomyProvider m_EconomyProvider;
         private readonly IConfiguration m_Configuration;
         private readonly IUserManager m_UserManager;
+        private readonly IStringLocalizer m_StringLocalizer;
 
-        public UnturnedPlayerDeathEventListener(IEconomyProvider economyProvider, IConfiguration configuration, IUserManager userManager)
+        public UnturnedPlayerDeathEventListener(IEconomyProvider economyProvider, IConfiguration configuration, IUserManager userManager,
+            IStringLocalizer stringLocalizer)
         {
             m_EconomyProvider = economyProvider;
             m_Configuration = configuration;
             m_UserManager = userManager;
+            m_StringLocalizer = stringLocalizer;
         }
 
         public Task HandleEventAsync(object? sender, UnturnedPlayerDeathEvent @event)
@@ -38,11 +42,13 @@ namespace EvolutionPlugins.Economy.Utilities.Events
                         loseMoney *= -1.0m;
 
                         var id = @event.Player.EntityInstanceId;
-                        var type = KnownActorTypes.Player;
+                        const string? type = KnownActorTypes.Player;
+                        var reason = m_StringLocalizer["balanceUpdationReason:death:player",
+                            new { DeathReason = @event.DeathCause.ToString().ToLower() }];
 
                         try
                         {
-                            await m_EconomyProvider.UpdateBalanceAsync(id, type, loseMoney, null);
+                            await m_EconomyProvider.UpdateBalanceAsync(id, type, loseMoney, reason);
                         }
                         catch (NotEnoughBalanceException)
                         {
@@ -73,7 +79,8 @@ namespace EvolutionPlugins.Economy.Utilities.Events
                 var payMoney = m_Configuration.GetValue<decimal>($"pay:player:{parsedLimb}", 0);
                 if (!payMoney.IsNearlyZero())
                 {
-                    await m_EconomyProvider.UpdateBalanceAsync(user.Id, user.Type, payMoney, null);
+                    var reason = m_StringLocalizer["balanceUpdationReason:kill:player", new { Player = user }];
+                    await m_EconomyProvider.UpdateBalanceAsync(user.Id, user.Type, payMoney, reason);
                 }
             });
 

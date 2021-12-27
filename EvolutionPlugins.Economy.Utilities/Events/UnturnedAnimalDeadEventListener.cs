@@ -3,6 +3,7 @@ using Cysharp.Threading.Tasks;
 using EvolutionPlugins.Economy.Utilities.Helpers;
 using EvolutionPlugins.Economy.Utilities.Patches;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Localization;
 using OpenMod.API.Eventing;
 using OpenMod.Core.Users;
 using OpenMod.Extensions.Economy.Abstractions;
@@ -15,11 +16,13 @@ namespace EvolutionPlugins.Economy.Utilities.Events
     {
         private readonly IEconomyProvider m_EconomyProvider;
         private readonly IConfiguration m_Configuration;
+        private readonly IStringLocalizer m_StringLocalizer;
 
-        public UnturnedAnimalDeadEventListener(IEconomyProvider economyProvider, IConfiguration configuration)
+        public UnturnedAnimalDeadEventListener(IEconomyProvider economyProvider, IConfiguration configuration, IStringLocalizer stringLocalizer)
         {
             m_EconomyProvider = economyProvider;
             m_Configuration = configuration;
+            m_StringLocalizer = stringLocalizer;
         }
 
         public Task HandleEventAsync(object? sender, UnturnedAnimalDeadEvent @event)
@@ -30,30 +33,23 @@ namespace EvolutionPlugins.Economy.Utilities.Events
             }
 
             var _damageAnimalParameters = Patch_DamageTool.s_CurrentDamageAnimalParameters;
-            var _params = Patch_DamageAnimalParameters.s_CurrentDamageAnimalParameters;
-            UniTask.RunOnThreadPool(async () =>
+            if (_damageAnimalParameters.instigator is not Player player)
             {
-                if (_damageAnimalParameters.instigator is not Player player)
-                {
-                    return;
-                }
+                return Task.CompletedTask;
+            }
 
-                var id = player.channel.owner.playerID.steamID.ToString();
-                var type = KnownActorTypes.Player;
+            var id = player.channel.owner.playerID.steamID.ToString();
+            const string? type = KnownActorTypes.Player;
 
-                var limb = ELimb.SPINE;
-                if (_params?.animal != null && _params?.animal == _damageAnimalParameters.animal)
-                {
-                    limb = _params.Value.limb;
-                }
-                var parsedLimb = limb.Parse();
+            var limb = _damageAnimalParameters.limb;
+            var parsedLimb = limb.Parse();
 
-                var payMoney = m_Configuration.GetValue<decimal>($"pay:animal:{parsedLimb}", 0);
-                if (!payMoney.IsNearlyZero())
-                {
-                    await m_EconomyProvider.UpdateBalanceAsync(id, type, payMoney, null);
-                }
-            });
+            var payMoney = m_Configuration.GetValue<decimal>($"pay:animal:{parsedLimb}", 0);
+            if (!payMoney.IsNearlyZero())
+            {
+                var reason = m_StringLocalizer["balanceUpdationReason:kill:animal"];
+                UniTask.RunOnThreadPool(() => m_EconomyProvider.UpdateBalanceAsync(id, type, payMoney, reason));
+            }
 
             return Task.CompletedTask;
         }

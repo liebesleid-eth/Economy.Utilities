@@ -1,0 +1,6 @@
+balanceUpdationReason:
+  kill:
+    player: "Killed a player {Player.FullDisplayName}"
+    animal: "Killed an animal"
+    zombie: "Killed a zombie"
+  death: "Was died by {DeathReason}"

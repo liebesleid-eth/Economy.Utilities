@@ -3,6 +3,7 @@ using Cysharp.Threading.Tasks;
 using EvolutionPlugins.Economy.Utilities.Helpers;
 using EvolutionPlugins.Economy.Utilities.Patches;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Localization;
 using OpenMod.API.Eventing;
 using OpenMod.Core.Users;
 using OpenMod.Extensions.Economy.Abstractions;
@@ -15,11 +16,13 @@ namespace EvolutionPlugins.Economy.Utilities.Events
     {
         private readonly IEconomyProvider m_EconomyProvider;
         private readonly IConfiguration m_Configuration;
+        private readonly IStringLocalizer m_StringLocalizer;
 
-        public UnturnedZombieDeadEventListener(IEconomyProvider economyProvider, IConfiguration configuration)
+        public UnturnedZombieDeadEventListener(IEconomyProvider economyProvider, IConfiguration configuration, IStringLocalizer stringLocalizer)
         {
             m_EconomyProvider = economyProvider;
             m_Configuration = configuration;
+            m_StringLocalizer = stringLocalizer;
         }
 
         public Task HandleEventAsync(object? sender, UnturnedZombieDeadEvent @event)
@@ -30,25 +33,23 @@ namespace EvolutionPlugins.Economy.Utilities.Events
             }
 
             var _damageZombieParameters = Patch_DamageTool.s_CurrentDamageZombieParameters;
-            UniTask.RunOnThreadPool(async () =>
+            if (_damageZombieParameters.instigator is not Player player)
             {
-                if (_damageZombieParameters.instigator is not Player player)
-                {
-                    return;
-                }
+                return Task.CompletedTask;
+            }
 
-                var id = player.channel.owner.playerID.steamID.ToString();
-                var type = KnownActorTypes.Player;
+            var id = player.channel.owner.playerID.steamID.ToString();
+            const string? type = KnownActorTypes.Player;
 
-                var parsedLimb = _damageZombieParameters.limb.Parse();
-                var isMega = _damageZombieParameters.zombie.isMega;
+            var parsedLimb = _damageZombieParameters.limb.Parse();
+            var isMega = _damageZombieParameters.zombie.isMega;
 
-                var payMoney = m_Configuration.GetValue<decimal>($"pay:zombie{(isMega ? "Mega" : string.Empty)}:{parsedLimb}", 0);
-                if (!payMoney.IsNearlyZero())
-                {
-                    await m_EconomyProvider.UpdateBalanceAsync(id, type, payMoney, null);
-                }
-            });
+            var payMoney = m_Configuration.GetValue<decimal>($"pay:zombie{(isMega ? "Mega" : string.Empty)}:{parsedLimb}", 0);
+            if (!payMoney.IsNearlyZero())
+            {
+                var reason = m_StringLocalizer["balanceUpdationReason:kill:zombie"];
+                UniTask.RunOnThreadPool(() => m_EconomyProvider.UpdateBalanceAsync(id, type, payMoney, reason));
+            }
 
             return Task.CompletedTask;
         }

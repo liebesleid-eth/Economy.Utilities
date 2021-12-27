@@ -11,7 +11,7 @@ namespace EvolutionPlugins.Economy.Utilities.Patches
 
         [HarmonyPatch(typeof(DamageTool), nameof(DamageTool.damageZombie))]
         [HarmonyPrefix]
-        private static void PreDamageZombie(DamageZombieParameters parameters)
+        private static void PreDamageZombie(ref DamageZombieParameters parameters)
         {
             s_CurrentDamageZombieParameters = parameters;
         }
@@ -25,7 +25,7 @@ namespace EvolutionPlugins.Economy.Utilities.Patches
 
         [HarmonyPatch(typeof(DamageTool), nameof(DamageTool.damageAnimal))]
         [HarmonyPrefix]
-        private static void PreDamageAnimal(DamageAnimalParameters parameters)
+        private static void PreDamageAnimal(ref DamageAnimalParameters parameters)
         {
             s_CurrentDamageAnimalParameters = parameters;
         }

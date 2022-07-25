@@ -1,9 +1,8 @@
 ﻿using System;
 
-namespace EvolutionPlugins.Economy.Utilities.Helpers
+namespace EvolutionPlugins.Economy.Utilities.Helpers;
+
+internal static class DecimalHelper
 {
-    public static class DecimalHelper
-    {
-        public static bool IsNearlyZero(this decimal value, decimal tolerance = 0.01m) => Math.Abs(value) < tolerance;
-    }
+    public static bool IsNearlyZero(this decimal value, decimal tolerance = 0.01m) => Math.Abs(value) < tolerance;
 }

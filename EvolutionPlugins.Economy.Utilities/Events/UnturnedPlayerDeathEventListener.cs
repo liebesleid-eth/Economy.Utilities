@@ -10,6 +10,7 @@ using OpenMod.Unturned.Players.Life.Events;
 using OpenMod.Unturned.Users;
 using SDG.Unturned;
 using Steamworks;
+using System.Drawing;
 
 namespace EvolutionPlugins.Economy.Utilities.Events;
 
@@ -75,6 +76,7 @@ internal class UnturnedPlayerDeathEventListener : IEventListener<UnturnedPlayerD
             {
                 var reason = m_StringLocalizer["balanceUpdationReason:kill:player", new { Player = user }];
                 await m_EconomyProvider.UpdateBalanceAsync(user.Id, user.Type, payMoney, reason);
+                user.PrintMessageAsync(m_StringLocalizer["balanceUpdationReason:kill:player", new { Player = user }], ColorTranslator.FromHtml(m_Configuration["color"]));
             }
         }).Forget();
 

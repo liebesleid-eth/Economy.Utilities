@@ -1,7 +1,8 @@
 balanceUpdationReason:
   kill:
-    player: "Killed a player {Player.FullActorName}"
-    playermessage: "You've obtained <color=red>50 credits</color> for killing {Player.FullActorName}"
+    player: "You've obtained <color=red>50 credits</color> for killing {Player.FullActorName}"
+    playerMessage: "You've obtained <color=red>50 credits</color> for killing {Player.DisplayName}"
     animal: "Killed an animal"
     zombie: "Killed a zombie"
+    zombieMessage: "Killed a zombie"
   death: "Was died by {DeathReason}"

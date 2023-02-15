@@ -32,6 +32,8 @@ internal class UnturnedPlayerDeathEventListener : IEventListener<UnturnedPlayerD
 
     public Task HandleEventAsync(object? sender, UnturnedPlayerDeathEvent @event)
     {
+        var victimUser = m_UnturnedUserDirectory.FindUser(@event.Player.SteamId);
+
         UniTask.RunOnThreadPool(async () =>
         {
             if (@event.Player != null)
@@ -76,7 +78,7 @@ internal class UnturnedPlayerDeathEventListener : IEventListener<UnturnedPlayerD
             {
                 var reason = m_StringLocalizer["balanceUpdationReason:kill:player", new { Player = user }];
                 await m_EconomyProvider.UpdateBalanceAsync(user.Id, user.Type, payMoney, reason);
-                user.PrintMessageAsync(m_StringLocalizer["balanceUpdationReason:kill:player", new { Player = user }], ColorTranslator.FromHtml(m_Configuration["color"]));
+                await user.PrintMessageAsync(m_StringLocalizer["balanceUpdationReason:kill:playerMessage", new { Player = victimUser }], ColorTranslator.FromHtml(m_Configuration["color"]));
             }
         }).Forget();
 
